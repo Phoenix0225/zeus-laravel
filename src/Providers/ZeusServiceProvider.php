@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zeus\Laravel\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Zeus\Core\Contracts\MetadataProviderInterface;
 use Zeus\Core\Contracts\StorageInterface;
@@ -15,8 +16,12 @@ use Zeus\Core\Registry\BusinessKeyRegistry;
 use Zeus\Core\Registry\EntityRegistry;
 use Zeus\Core\Registry\FieldRegistry;
 use Zeus\Core\Registry\RelationRegistry;
+use Zeus\Core\Metadata\Events\FieldAddedEvent;
+use Zeus\Core\Metadata\Events\FieldDeletedEvent;
+use Zeus\Core\Metadata\Events\FieldUpdatedEvent;
 use Zeus\Laravel\Adapters\DatabaseMetadataProvider;
 use Zeus\Laravel\Adapters\LaravelDatabaseStorage;
+use Zeus\Laravel\Listeners\SchemaSynchronizer;
 
 class ZeusServiceProvider extends ServiceProvider
 {
@@ -44,6 +49,11 @@ class ZeusServiceProvider extends ServiceProvider
             return $databaseProvider;
         });
         $this->app->bind(StorageInterface::class, LaravelDatabaseStorage::class);
+
+        $this->app->singleton(
+            \Zeus\Core\Contracts\TenantContextResolverInterface::class,
+            \Zeus\Laravel\Context\HttpTenantContextResolver::class
+        );
 
         // Bind les registres comme singletons pour qu'ils soient partagés
         $this->app->singleton(EntityRegistry::class);
@@ -77,6 +87,10 @@ class ZeusServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(FieldAddedEvent::class, [SchemaSynchronizer::class, 'handleFieldAdded']);
+        Event::listen(FieldUpdatedEvent::class, [SchemaSynchronizer::class, 'handleFieldUpdated']);
+        Event::listen(FieldDeletedEvent::class, [SchemaSynchronizer::class, 'handleFieldDeleted']);
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../../config/zeus.php' => config_path('zeus.php'),
