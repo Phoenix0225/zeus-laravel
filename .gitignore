@@ -1,0 +1,23 @@
+# Dépendances Composer
+/vendor/
+composer.lock
+
+# Cache et Rapports de Tests (PHPUnit)
+.phpunit.cache/
+phpunit.result.cache
+/coverage/
+/reports/
+
+# Fichiers d'environnement locaux (si tu utilises Orchestra Testbench)
+.env
+.env.*.local
+
+# Dossiers d'IDE et d'éditeurs (PHPStorm, VSCode, etc.)
+/.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers générés par le système d'exploitation
+.DS_Store
+Thumbs.db
