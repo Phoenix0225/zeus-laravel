@@ -1,22 +1,22 @@
 {
-  "name": "synapse/zeus-laravel",
+  "name": "zeus-erp/zeus-laravel",
   "description": "L'adaptateur Laravel 13 pour le moteur ERP metadata-driven Zeus Core.",
   "type": "library",
   "license": "BSL-1.1",
   "authors": [
     {
-      "name": "Équipe TI - Synapse Électronique",
-      "role": "Développement"
+      "name": "Francis Blanchette",
+      "role": "Founder & Architect"
     }
   ],
   "require": {
     "php": "^8.4",
     "illuminate/support": "^13.0",
     "illuminate/database": "^13.0",
-    "synapse/zeus-core": "@dev"
+    "zeus-erp/zeus-core": "@dev"
   },
   "require-dev": {
-    "orchestra/testbench": "^10.0",
+    "orchestra/testbench": "^11.0",
     "phpunit/phpunit": "^11.0"
   },
   "autoload": {
