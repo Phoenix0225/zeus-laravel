@@ -14,7 +14,7 @@ Zeus Laravel est l'adaptateur officiel pour connecter `zeus-core` à Laravel. Il
 ## Installation & Déploiement
 
 ```bash
-composer require ton-nom/zeus-laravel
+composer require phoenix0225/zeus-laravel
 ```
 
 Installation complète "Clé en main" :
