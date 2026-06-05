@@ -21,7 +21,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Zeus\\Laravel\\": "src/"
+      "Zeus\\Laravel\\": "src/",
+      "Zeus\\Laravel\\Database\\Seeders\\": "database/seeders/"
     }
   },
   "autoload-dev": {

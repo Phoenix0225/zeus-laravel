@@ -55,13 +55,23 @@ class ZeusServiceProvider extends ServiceProvider
             \Zeus\Laravel\Context\HttpTenantContextResolver::class
         );
 
+        $this->app->singleton(
+            \Zeus\Core\Contracts\EntityStorageInterface::class,
+            \Zeus\Laravel\Storage\LaravelEntityStorage::class
+        );
+
+        $this->app->singleton(
+            \Zeus\Core\Contracts\EntityQueryExecutorInterface::class,
+            \Zeus\Laravel\Query\LaravelEntityQueryExecutor::class
+        );
+
         // Bind les registres comme singletons pour qu'ils soient partagés
         $this->app->singleton(EntityRegistry::class);
         $this->app->singleton(FieldRegistry::class);
         $this->app->singleton(BusinessKeyRegistry::class);
         $this->app->singleton(RelationRegistry::class);
-
-        // Instanciation du Kernel avec ses 5 arguments requis
+        $this->app->singleton(\Zeus\Core\Registry\UiRegistry::class);
+        $this->app->singleton(\Zeus\Core\Security\RoleRegistry::class);        // Instanciation du Kernel avec ses 5 arguments requis
         $this->app->singleton(ZeusKernel::class, function ($app) {
             return new ZeusKernel(
                 $app->make(MetadataProviderInterface::class),
@@ -87,6 +97,13 @@ class ZeusServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Zeus\Laravel\Routing\EntityRouteRegistrar::register();
+        \Zeus\Laravel\Routing\UiRouteRegistrar::register();
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+
+        $roleRegistry = $this->app->make(\Zeus\Core\Security\RoleRegistry::class);
+        $roleRegistry->registerRole('admin', ['*']);
+        $roleRegistry->registerRole('reader', ['*.read']); // Convention pour dire "lecture sur tout"
         Event::listen(FieldAddedEvent::class, [SchemaSynchronizer::class, 'handleFieldAdded']);
         Event::listen(FieldUpdatedEvent::class, [SchemaSynchronizer::class, 'handleFieldUpdated']);
         Event::listen(FieldDeletedEvent::class, [SchemaSynchronizer::class, 'handleFieldDeleted']);
@@ -98,6 +115,7 @@ class ZeusServiceProvider extends ServiceProvider
 
             $this->commands([
                 \Zeus\Laravel\Console\ClearMetadataCacheCommand::class,
+                \Zeus\Laravel\Console\Commands\InstallZeusCommand::class,
             ]);
         }
 
