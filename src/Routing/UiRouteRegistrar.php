@@ -14,6 +14,7 @@ class UiRouteRegistrar
         Route::prefix('api/ui')->group(function () {
             Route::get('/config', [UiController::class, 'config']);
             Route::get('/screens/{id}', [UiController::class, 'screen']);
+            Route::get('/actions', [\Zeus\Laravel\Http\Controllers\ActionController::class, 'index']);
         });
     }
 }

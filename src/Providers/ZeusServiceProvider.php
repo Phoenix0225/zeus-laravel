@@ -65,6 +65,16 @@ class ZeusServiceProvider extends ServiceProvider
             \Zeus\Laravel\Query\LaravelEntityQueryExecutor::class
         );
 
+        $this->app->singleton(
+            \Zeus\Core\Rules\RuleProviderInterface::class,
+            \Zeus\Laravel\Rules\DatabaseRuleProvider::class
+        );
+
+        $this->app->singleton(
+            \Zeus\Core\Rules\ActionResolverInterface::class,
+            \Zeus\Laravel\Rules\LaravelActionResolver::class
+        );
+
         // Bind les registres comme singletons pour qu'ils soient partagés
         $this->app->singleton(EntityRegistry::class);
         $this->app->singleton(FieldRegistry::class);
@@ -72,6 +82,7 @@ class ZeusServiceProvider extends ServiceProvider
         $this->app->singleton(RelationRegistry::class);
         $this->app->singleton(\Zeus\Core\Registry\UiRegistry::class);
         $this->app->singleton(\Zeus\Core\Security\RoleRegistry::class);        // Instanciation du Kernel avec ses 5 arguments requis
+        $this->app->singleton(\Zeus\Laravel\Rules\ActionRegistry::class);
         $this->app->singleton(ZeusKernel::class, function ($app) {
             return new ZeusKernel(
                 $app->make(MetadataProviderInterface::class),
@@ -104,6 +115,14 @@ class ZeusServiceProvider extends ServiceProvider
         $roleRegistry = $this->app->make(\Zeus\Core\Security\RoleRegistry::class);
         $roleRegistry->registerRole('admin', ['*']);
         $roleRegistry->registerRole('reader', ['*.read']); // Convention pour dire "lecture sur tout"
+        
+        $registry = $this->app->make(\Zeus\Laravel\Rules\ActionRegistry::class);
+        $registry->register(
+            \App\Zeus\Actions\DummyLogAction::class, // Ou toute autre classe existante
+            'Journalisation Système',
+            'Ajoute une entrée dans les logs de Laravel',
+            ['message' => 'string']
+        );
         Event::listen(FieldAddedEvent::class, [SchemaSynchronizer::class, 'handleFieldAdded']);
         Event::listen(FieldUpdatedEvent::class, [SchemaSynchronizer::class, 'handleFieldUpdated']);
         Event::listen(FieldDeletedEvent::class, [SchemaSynchronizer::class, 'handleFieldDeleted']);
@@ -116,6 +135,8 @@ class ZeusServiceProvider extends ServiceProvider
             $this->commands([
                 \Zeus\Laravel\Console\ClearMetadataCacheCommand::class,
                 \Zeus\Laravel\Console\Commands\InstallZeusCommand::class,
+                \Zeus\Laravel\Console\Commands\SyncSchemaCommand::class,
+                \Zeus\Laravel\Console\Commands\MakeActionCommand::class,
             ]);
         }
 
