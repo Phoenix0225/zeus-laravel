@@ -132,9 +132,14 @@ class ZeusServiceProvider extends ServiceProvider
                 __DIR__ . '/../../config/zeus.php' => config_path('zeus.php'),
             ], 'zeus-config');
 
+            $this->publishes([
+                __DIR__.'/../../stubs/app.js' => resource_path('js/app.js'),
+                __DIR__.'/../../stubs/welcome.blade.php' => resource_path('views/welcome.blade.php'),
+            ], 'zeus-frontend');
+
             $this->commands([
                 \Zeus\Laravel\Console\ClearMetadataCacheCommand::class,
-                \Zeus\Laravel\Console\Commands\InstallZeusCommand::class,
+                \Zeus\Laravel\Console\Commands\InstallCommand::class,
                 \Zeus\Laravel\Console\Commands\SyncSchemaCommand::class,
                 \Zeus\Laravel\Console\Commands\MakeActionCommand::class,
             ]);

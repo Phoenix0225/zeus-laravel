@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('name');
             $table->string('table_name');
+            $table->string('module')->default('core');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -34,6 +35,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('type');
             $table->string('entity_code')->nullable();
+            $table->string('module')->default('core');
             $table->json('config');
             $table->timestamps();
         });
@@ -43,6 +45,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('label');
             $table->string('icon')->nullable();
+            $table->string('module')->default('core');
             $table->foreignId('parent_id')->nullable()->constrained('x_ui_menus')->cascadeOnDelete();
             $table->string('screen_id')->nullable();
             $table->integer('order')->default(0);
